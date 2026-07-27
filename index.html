@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Mirna Christmas Place - Portal de Asesores</title>
+<meta name="theme-color" content="#efe4c8">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Jost:wght@400;500;600&display=block" rel="stylesheet">
+
+<style>
+/* ============ TOKENS ============ */
+:root {
+  --parchment:        #efe4c8;
+  --ink-green:        #1f2a1a;
+  --ink-green-soft:   #3a4a32;
+  --cream:            #fbf6e9;
+  --cream-soft:       #f6efdc;
+  --gold:             #c9a24b;
+  --gold-soft:        #e3c878;
+  --wax:              #7a1f1f;
+  --text-dim:         #6b5d44;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-script:  'Great Vibes', cursive;
+  --font-ui:      'Jost', 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  font-family: var(--font-ui);
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,162,75,.16), transparent 60%), linear-gradient(180deg, var(--cream) 0%, var(--cream-soft) 100%);
+  color: var(--ink-green);
+  margin: 0; padding: 0; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+.paper-grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9000;
+  opacity: .05; mix-blend-mode: multiply;
+  background-image: radial-gradient(circle at 20% 30%, rgba(0,0,0,.5) 0, transparent 1px), radial-gradient(circle at 70% 65%, rgba(0,0,0,.4) 0, transparent 1px);
+  background-size: 3px 3px, 4px 4px;
+}
+
+/* ============ ESTRUCTURA PRINCIPAL ============ */
+.brand-lockup { text-align: center; margin-bottom: 2rem; user-select: none; }
+.logo-mirna { margin: 0; font-family: var(--font-display); color: var(--wax); font-size: 2em; letter-spacing: 0.05em; line-height: 0.8; text-transform: uppercase; }
+.logo-cp { margin: -0.1em 0 0 0; font-family: var(--font-script); color: var(--ink-green); font-size: 2.2em; line-height: 1; }
+.logo-cp .logo-star { font-family: sans-serif; color: var(--ink-green-soft); font-size: 0.4em; vertical-align: super; }
+
+.card-container {
+  background: var(--cream);
+  border-radius: 18px;
+  width: min(90vw, 480px);
+  padding: 2.5em 2em;
+  box-shadow: 0 24px 50px -20px rgba(40,25,10,.3);
+  border: 1px solid var(--gold-soft);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* ============ VISTAS (SPA) ============ */
+.view { display: none; opacity: 0; transition: opacity 0.4s ease; }
+.view.is-active { display: block; opacity: 1; animation: fadeIn 0.4s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* VISTA: BUSCADOR */
+.input-group { margin-bottom: 1.5rem; }
+.input-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--wax); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.input-field {
+  width: 100%; padding: 0.8em 1em; font-family: var(--font-ui); font-size: 1rem;
+  border: 1px solid var(--gold-soft); border-radius: 8px; background: var(--parchment);
+  color: var(--ink-green); outline: none; transition: border-color 0.2s;
+}
+.input-field:focus { border-color: var(--wax); box-shadow: 0 0 0 3px rgba(122, 31, 31, 0.1); }
+
+/* VISTA: RESULTADO */
+.result-header { font-family: var(--font-display); font-size: 1.4rem; color: var(--ink-green); margin: 0 0 1rem; text-align: center; border-bottom: 1px solid var(--gold-soft); padding-bottom: 0.8rem; }
+.result-row { display: flex; flex-direction: column; margin-bottom: 0.8rem; }
+.result-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.result-value { font-size: 1.05rem; font-weight: 500; color: var(--ink-green); }
+.status-badge { display: inline-block; padding: 0.3em 0.8em; background: rgba(111, 131, 80, 0.2); color: #4a5c32; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 1rem; }
+.error-msg { text-align: center; color: var(--wax); font-weight: 500; margin: 1rem 0; font-size: 1.1rem; }
+
+/* VISTA: REGISTRO (IFRAME) */
+.iframe-container { position: relative; width: 100%; height: 60vh; max-height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid var(--gold-soft); margin-bottom: 1rem; }
+.rsvp-iframe { position: absolute; top: -320px; left: 0; width: 100%; height: calc(100% + 320px); border: 0; }
+.loading-overlay { position: absolute; inset: 0; background: var(--cream); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; transition: opacity 0.3s; }
+.loading-overlay.is-hidden { opacity: 0; pointer-events: none; }
+.spinner { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--gold-soft); border-top-color: var(--wax); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* BOTONES */
+.btn-group { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+.btn { 
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  font-family: var(--font-ui); font-weight: 600; letter-spacing: .04em; font-size: .95rem; 
+  padding: .9em 1.4em; border-radius: 999px; cursor: pointer; border: 1.5px solid var(--gold); 
+  transition: all .2s ease; 
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-primary { background: var(--ink-green); color: var(--cream); border-color: var(--ink-green); }
+.btn-primary:hover { background: #16200f; box-shadow: 0 8px 18px -8px rgba(20,15,5,.5); }
+.btn-secondary { background: var(--cream); color: var(--ink-green); }
+.btn-secondary:hover { background: #fff; box-shadow: 0 8px 18px -8px rgba(40,25,10,.3); }
+
+/* MENSAJE FLOTANTE DE ÉXITO */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+  background: var(--ink-green); color: var(--cream); padding: 1em 2em;
+  border-radius: 30px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.25, 1, 0.4, 1); z-index: 9999;
+}
+.toast.is-visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+</style>
+</head>
+<body>
+
+<div class="paper-grain"></div>
+
+<div class="toast" id="toastMessage">✅ ¡Usuario registrado con éxito!</div>
+
+<div class="brand-lockup">
+  <p class="logo-mirna">MIRNA</p>
+  <p class="logo-cp">Christmas Place <span class="logo-star">✦</span></p>
+</div>
+
+<div class="card-container">
+  
+  <!-- VISTA 1: BUSCADOR -->
+  <div id="view-search" class="view is-active">
+    <div class="input-group">
+      <label class="input-label" for="cedulaInput">Número de Cédula</label>
+      <input type="number" id="cedulaInput" class="input-field" placeholder="Ej: 0912345678" pattern="\d*">
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="btnConsultar">Consultar Asistencia</button>
+      <button class="btn btn-secondary" id="btnIrRegistro">Registrar Nuevo Cliente</button>
+    </div>
+  </div>
+
+  <!-- VISTA 2: RESULTADOS -->
+  <div id="view-result" class="view">
+    <div id="resultContent">
+      <!-- Aquí se inyectan los datos desde JS -->
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" id="btnVolverBuscador">← Volver a buscar</button>
+    </div>
+  </div>
+
+  <!-- VISTA 3: REGISTRO (IFRAME) -->
+  <div id="view-register" class="view">
+    <div class="iframe-container">
+      <div class="loading-overlay" id="iframeLoading">
+        <div class="spinner"></div>
+        <p style="margin-top: 1em; font-size: 0.9rem; color: var(--text-dim);">Cargando formulario...</p>
+      </div>
+      <!-- Enlace oficial de Forms -->
+      <iframe id="registerIframe" class="rsvp-iframe" data-src="https://docs.google.com/forms/d/e/1FAIpQLSfedSos302Ex8IAuMK7-FrpXMVuezhccrf_VReo1-s_n9575g/viewform?usp=publish-editor&embedded=true"></iframe>
+    </div>
+    <button class="btn btn-secondary" id="btnCancelarRegistro">← Cancelar y Volver</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Elementos del DOM
+  const views = {
+    search: document.getElementById('view-search'),
+    result: document.getElementById('view-result'),
+    register: document.getElementById('view-register')
+  };
+  const cedulaInput = document.getElementById('cedulaInput');
+  const resultContent = document.getElementById('resultContent');
+  const iframe = document.getElementById('registerIframe');
+  const iframeLoading = document.getElementById('iframeLoading');
+  const toast = document.getElementById('toastMessage');
+
+  // Navegación entre vistas
+  function showView(viewName) {
+    Object.values(views).forEach(v => v.classList.remove('is-active'));
+    views[viewName].classList.add('is-active');
+  }
+
+  // Mostrar mensaje flotante (Toast)
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('is-visible');
+    setTimeout(() => toast.classList.remove('is-visible'), 4000);
+  }
+
+  // Lógica de Consulta en Tiempo Real
+  document.getElementById('btnConsultar').addEventListener('click', function() {
+    const cedula = cedulaInput.value.trim();
+    if(!cedula) {
+      alert("Por favor ingresa un número de cédula");
+      return;
+    }
+
+    const btn = this;
+    const btnOriginalText = btn.textContent;
+    btn.textContent = "Buscando...";
+    btn.disabled = true;
+
+    // =========================================================
+    // URL DE LA APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+    // =========================================================
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw0BNxuYMEyizL_ZCs56rRI9E-HldJfWTWP5Qrui719PMmW2voxfgB0_2VcGPR-lxp2/exec"; 
+    
+    const finalUrl = WEB_APP_URL + "?cedula=" + encodeURIComponent(cedula);
+
+    fetch(finalUrl)
+      .then(response => response.json())
+      .then(data => {
+        if (data.encontrado) {
+          resultContent.innerHTML = `
+            <div style="text-align: center;">
+              <span class="status-badge">✅ Registrado</span>
+            </div>
+            <h3 class="result-header">${data.nombre}</h3>
+            <div class="result-row">
+              <span class="result-label">Cédula</span>
+              <span class="result-value">${cedula}</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Correo</span>
+              <span class="result-value">${data.correo}</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Celular</span>
+              <span class="result-value">${data.celular}</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Rango de Hora</span>
+              <span class="result-value">${data.rangoHora}</span>
+            </div>
+            <div class="result-row" style="flex-direction: row; justify-content: space-between; border-top: 1px dashed var(--gold-soft); padding-top: 0.8rem; margin-top: 0.5rem;">
+              <div>
+                <span class="result-label">Asistentes</span><br>
+                <span class="result-value">${data.asistentes}</span>
+              </div>
+              <div style="text-align:right;">
+                <span class="result-label">Asesor</span><br>
+                <span class="result-value">${data.asesor}</span>
+              </div>
+            </div>
+          `;
+        } else {
+          resultContent.innerHTML = `
+            <div class="error-msg">
+              <span style="display:block; font-size: 2.5rem; margin-bottom: 0.2em;">⚠️</span>
+              Usuario no registrado con el número de cédula:<br><strong>${cedula}</strong>
+            </div>
+          `;
+        }
+        showView('result');
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Hubo un error al conectar con la base de datos.");
+      })
+      .finally(() => {
+        btn.textContent = btnOriginalText;
+        btn.disabled = false;
+      });
+  });
+
+  document.getElementById('btnVolverBuscador').addEventListener('click', () => {
+    cedulaInput.value = '';
+    showView('search');
+  });
+
+  // Lógica de Registro (Iframe)
+  let iframeLoadCount = 0;
+  let isIframeActive = false;
+
+  document.getElementById('btnIrRegistro').addEventListener('click', () => {
+    iframeLoadCount = 0;
+    isIframeActive = true;
+    iframeLoading.classList.remove('is-hidden');
+    iframe.src = iframe.getAttribute('data-src');
+    showView('register');
+  });
+
+  document.getElementById('btnCancelarRegistro').addEventListener('click', () => {
+    isIframeActive = false;
+    iframe.src = ""; // Detiene el iframe
+    showView('search');
+  });
+
+  iframe.addEventListener('load', function() {
+    if (!isIframeActive) return;
+    
+    iframeLoadCount++;
+    
+    if (iframeLoadCount === 1) {
+      // Primera carga (Formulario vacío listo)
+      iframeLoading.classList.add('is-hidden');
+    } else if (iframeLoadCount === 3) {
+      // Tercera carga (Formulario enviado exitosamente)
+      showToast('✅ ¡Usuario registrado con éxito!');
+      isIframeActive = false;
+      iframe.src = ""; // Limpiar iframe
+      cedulaInput.value = ''; // Limpiar buscador
+      showView('search'); // Volver al inicio
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
