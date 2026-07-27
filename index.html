@@ -88,7 +88,7 @@ body {
 
 /* VISTA: REGISTRO (IFRAME) */
 .iframe-container { position: relative; width: 100%; height: 60vh; max-height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid var(--gold-soft); margin-bottom: 1rem; }
-.rsvp-iframe { position: absolute; top: -320px; left: 0; width: 100%; height: calc(100% + 320px); border: 0; }
+.rsvp-iframe { position: absolute; top: -220px; left: 0; width: 100%; height: calc(100% + 220px); border: 0; }
 .loading-overlay { position: absolute; inset: 0; background: var(--cream); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; transition: opacity 0.3s; }
 .loading-overlay.is-hidden { opacity: 0; pointer-events: none; }
 .spinner { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--gold-soft); border-top-color: var(--wax); animation: spin 0.8s linear infinite; }
@@ -212,9 +212,9 @@ body {
     btn.disabled = true;
 
     // =========================================================
-    // URL DE LA APLICACIÓN WEB DE GOOGLE APPS SCRIPT
+    // URL DE LA APLICACIÓN WEB DE GOOGLE APPS SCRIPT ACTUALIZADA
     // =========================================================
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw0BNxuYMEyizL_ZCs56rRI9E-HldJfWTWP5Qrui719PMmW2voxfgB0_2VcGPR-lxp2/exec"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz5JhQi6-sJgNNnkgWTQRyPlFzSGWWkNB4kWbo7ko1aesiPd_2yZ0Dsd1igHMFi0_CZ/exec"; 
     
     const finalUrl = WEB_APP_URL + "?cedula=" + encodeURIComponent(cedula);
 
